@@ -96,22 +96,31 @@ module.exports = {
   },
 
   compoundPath: function(compound, options) {
+    var outputDir = path.dirname(options.output);
+    var filename;
+  
     if (compound.kind == 'page') {
-      return path.dirname(options.output) + "/page-" + compound.name + ".md";
+      filename = 'page-' + sanitizeFilename(compound.name) + '.md';
+      return path.join(outputDir, filename);
     } else if (options.groups) {
-      return util.format(options.output, compound.groupname);
+      filename = sanitizeFilename(util.format(options.output, compound.groupname));
+      return filename;
     } else if (options.classes) {
-      return util.format(options.output, compound.name.replace(/\:/g, '-').replace('<', '(').replace('>', ')'));
+      var sanitizedName = sanitizeFilename(compound.name);
+      filename = util.format(options.output, sanitizedName);
+      return filename;
     } else {
-      return options.output;
+      filename = sanitizeFilename(options.output);
+      return filename;
     }
   },
 
   writeCompound: function(compound, contents, references, options) {
-    this.writeFile(this.compoundPath(compound, options), contents.map(function(content) {
+    var filepath = this.compoundPath(compound, options);
+    this.writeFile(filepath, contents.map(function(content) {
       return this.resolveRefs(content, compound, references, options);
     }.bind(this)));
-  },
+  },  
 
   // Write the output file
   writeFile: function (filepath, contents) {
