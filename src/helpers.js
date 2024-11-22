@@ -12,6 +12,10 @@ var util = require('util');
 var log = require('./logger').getLogger();
 var handlebars = require('handlebars');
 
+function sanitizeFilename(filename) {
+  return filename.replace(/[:<>"/\\|?*\s]/g, '_').toLowerCase();
+}
+
 module.exports = {
 
   inline: function(code) {
